@@ -1,20 +1,30 @@
-# AUTO HUB — Mirror Glass 1.0.0
+# AUTO HUB — Mirror Glass 1.0.1
 
-Premium automotive maintenance app prototype implemented as a native Android Java project without external UI libraries.
+Android-приложение для обслуживания и учёта автомобиля.
 
-## Included
-- Dark Mirror Glass theme
-- Light Silver Mirror Glass theme
-- Dashboard
-- Maintenance list
-- Expenses
-- Vehicle profile
-- Settings/theme switching
-- Local persistence for theme and basic add-record interaction
-- GitHub Actions workflow producing a debug APK
+## Сборка GitHub Actions
 
-## Build
-Use Android Studio or GitHub Actions. The included workflow uses Gradle 8.11.1, Java 17, Android SDK 35 and AGP 8.9.2.
+Workflow: `.github/workflows/build.yml`
 
-## Important
-This is a functional visual foundation. Vehicle data in the demo is clearly static sample content; it is not presented as live telemetry or diagnostic truth. Expand the persistence layer and forms before production release.
+Поддерживается запуск вручную через **Actions → AUTO HUB Android Build → Run workflow**, а также автоматически при push в `main`/`master`.
+
+Сборка использует:
+- JDK 17
+- Android SDK 35
+- Android Build Tools 35.0.0
+- Gradle 8.11.1
+- Android Gradle Plugin 8.9.2
+
+Результат: `app/build/outputs/apk/debug/app-debug.apk`
+
+## Интерфейс
+
+- Black Mirror Glass — тёмная тема
+- Silver/White Mirror Glass — светлая тема
+- Главная
+- Обслуживание
+- Расходы
+- Автомобиль
+- Ещё
+
+Проект не требует Gradle Wrapper: GitHub Actions устанавливает Gradle 8.11.1 через `gradle/actions/setup-gradle`.
