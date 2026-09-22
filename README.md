@@ -1,22 +1,7 @@
-# AUTO HUB Mirror Glass 1.1.0
+# AUTO HUB 1.2.0
 
-Следующий этап AUTO HUB: Mirror Glass UI + локальная сервисная книга.
+Premium automotive management app with Black Mirror Glass / Silver White Mirror Glass UI.
 
-## Что добавлено
-- Исправлен GitHub Actions: удалён `android-actions/setup-android@v3`, который пытался установить устаревший пакет `tools`.
-- SDK устанавливается напрямую через `sdkmanager` из runner.
-- Dark Black Mirror Glass и Light Silver/White Mirror Glass.
-- Профиль автомобиля с сохранением марки/модели, двигателя, года и пробега.
-- Локальные записи ТО, заправок и расходов.
-- История операций сохраняется между запусками приложения.
-- Быстрые действия с главного экрана.
-- Сервисная книга с количеством записей.
-- Экран расходов с последними локальными операциями.
-- Плавная смена системных status/navigation bar под тему.
-- Версия 1.1.0.
+Implemented: vehicle profile, maintenance records, fuel records, expenses, reminders, problems, local persistence, calculated saved-operation totals, swipe/navigation, dark/light theme, quick actions, GitHub Actions build.
 
-## Ограничения этапа
-Нет сетевой диагностики, GPS, банковских данных или внешней базы сервисов. Приложение не выдумывает полученные от автомобиля показатели: пользователь вводит фактические данные.
-
-## Сборка
-GitHub Actions: JDK 17, Android SDK 35, Build Tools 35.0.0, Gradle 8.11.1.
+The app intentionally shows no fabricated vehicle data. Core data is stored locally with SharedPreferences in this lightweight baseline.
