@@ -84,7 +84,7 @@ void searchScreen(){header("Поиск","Поиск по локальной ба
  void confirmDelete(String table,long id){new AlertDialog.Builder(this).setTitle("Удалить запись?").setMessage("Это действие нельзя отменить.").setNegativeButton("Отмена",null).setPositiveButton("Удалить",(d,w)->{db.delete(table,"id=?",new String[]{String.valueOf(id)});if("reminder".equals(table))ReminderWorker.cancel(this,id);render();}).show();}
  void pickPhoto(){Intent i;if(Build.VERSION.SDK_INT>=33)i=new Intent("android.provider.action.PICK_IMAGES");else{i=new Intent(Intent.ACTION_OPEN_DOCUMENT);i.setType("image/*");i.addCategory(Intent.CATEGORY_OPENABLE);}startActivityForResult(i,PICK_PHOTO);}
  void pickFile(){Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);i.setType("*/*");i.addCategory(Intent.CATEGORY_OPENABLE);startActivityForResult(i,PICK_FILE);}
- JSONObject buildBackupJson(){try{JSONObject r=new JSONObject();r.put("schemaVersion",2);r.put("appVersion","2.1.0");r.put("exportedAt",System.currentTimeMillis());JSONObject settings=new JSONObject();settings.put("light",light);settings.put("lang",lang);settings.put("activeVehicleId",active);r.put("settings",settings);String[] tables={"vehicle","service","fuel","expense","reminder","issue","tire","document","part","service_center","activity"};for(String table:tables){JSONArray a=new JSONArray();Cursor c=db.raw("SELECT * FROM "+table,null);try{while(c.moveToNext()){JSONObject o=new JSONObject();for(int i=0;i<c.getColumnCount();i++)o.put(c.getColumnName(i),c.getString(i));a.put(o);}}finally{c.close();}r.put(table,a);}return r;}catch(Exception e){throw new IllegalStateException(e);}}
+ JSONObject buildBackupJson(){try{JSONObject r=new JSONObject();r.put("schemaVersion",2);r.put("appVersion","2.1.3");r.put("exportedAt",System.currentTimeMillis());JSONObject settings=new JSONObject();settings.put("light",light);settings.put("lang",lang);settings.put("activeVehicleId",active);r.put("settings",settings);String[] tables={"vehicle","service","fuel","expense","reminder","issue","tire","document","part","service_center","activity"};for(String table:tables){JSONArray a=new JSONArray();Cursor c=db.raw("SELECT * FROM "+table,null);try{while(c.moveToNext()){JSONObject o=new JSONObject();for(int i=0;i<c.getColumnCount();i++)o.put(c.getColumnName(i),c.getString(i));a.put(o);}}finally{c.close();}r.put(table,a);}return r;}catch(Exception e){throw new IllegalStateException(e);}}
 void exportBackup(){try{String json=buildBackupJson().toString(2);Intent i=new Intent(Intent.ACTION_CREATE_DOCUMENT);i.setType("application/json");i.putExtra(Intent.EXTRA_TITLE,"AUTO_HUB_backup.json");getPreferences(0).edit().putString("backup_pending",json).apply();startActivityForResult(i,9001);}catch(Exception e){toast("Ошибка экспорта");}}
 void exportFullBackup(){try{JSONObject json=buildBackupJson();File zipFile=new File(getCacheDir(),"AUTO_HUB_full_backup.zip");ZipOutputStream zos=new ZipOutputStream(new FileOutputStream(zipFile));ZipEntry je=new ZipEntry("backup.json");zos.putNextEntry(je);zos.write(json.toString(2).getBytes("UTF-8"));zos.closeEntry();File dir=new File(getFilesDir(),"attachments");if(dir.exists()){File[] files=dir.listFiles();if(files!=null)for(File file:files){if(!file.isFile())continue;ZipEntry e=new ZipEntry("attachments/"+file.getName());zos.putNextEntry(e);FileInputStream in=new FileInputStream(file);byte[] buf=new byte[8192];int n;while((n=in.read(buf))!=-1)zos.write(buf,0,n);in.close();zos.closeEntry();}}zos.close();getPreferences(0).edit().putString("full_backup_pending",zipFile.getAbsolutePath()).apply();Intent i=new Intent(Intent.ACTION_CREATE_DOCUMENT);i.setType("application/zip");i.putExtra(Intent.EXTRA_TITLE,"AUTO_HUB_full_backup.zip");startActivityForResult(i,9002);}catch(Exception e){toast("Не удалось создать полную копию");}}
 void importBackup(){Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);i.setType("application/json");i.addCategory(Intent.CATEGORY_OPENABLE);startActivityForResult(i,IMPORT);}
@@ -96,6 +96,40 @@ String readText(File f)throws IOException{StringBuilder b=new StringBuilder();Bu
 void copyFile(File a,File b)throws IOException{FileInputStream in=new FileInputStream(a);FileOutputStream out=new FileOutputStream(b);byte[] buf=new byte[8192];int n;while((n=in.read(buf))!=-1)out.write(buf,0,n);in.close();out.close();}
 void deleteTree(File f){if(f==null||!f.exists())return;if(f.isDirectory()){File[] fs=f.listFiles();if(fs!=null)for(File x:fs)deleteTree(x);}f.delete();}
 
+
+String resolveAttachment(String value){
+    if(value==null||value.trim().isEmpty()) return "";
+    String v=value.trim();
+    if(v.startsWith("/")) return v;
+    if(v.startsWith("content://")||v.startsWith("file://")||v.startsWith("android.resource://")) return v;
+    File f=new File(getFilesDir(),"attachments/"+v);
+    return f.exists()?f.getAbsolutePath():v;
+}
+String copyAttachmentToApp(Uri uri,String kind)throws IOException{
+    if(uri==null)throw new IOException("empty uri");
+    File dir=new File(getFilesDir(),"attachments");
+    if(!dir.exists()&&!dir.mkdirs())throw new IOException("attachments directory unavailable");
+    String mime=getContentResolver().getType(uri);
+    String ext="";
+    if(mime!=null){
+        int slash=mime.lastIndexOf('/');
+        if(slash>=0&&slash<mime.length()-1)ext="."+mime.substring(slash+1).replaceAll("[^A-Za-z0-9]","");
+    }
+    if(ext.isEmpty()){
+        String name=null; Cursor c=null;
+        try{c=getContentResolver().query(uri,new String[]{android.provider.OpenableColumns.DISPLAY_NAME},null,null,null);if(c!=null&&c.moveToFirst())name=c.getString(0);}finally{if(c!=null)c.close();}
+        if(name!=null){int dot=name.lastIndexOf('.');if(dot>=0)ext=name.substring(dot).replaceAll("[^A-Za-z0-9.]","");}
+    }
+    if(ext.length()>10)ext=ext.substring(0,10);
+    String safeKind=(kind==null||kind.isEmpty())?"file":kind.replaceAll("[^A-Za-z0-9_-]","");
+    File out=new File(dir,System.currentTimeMillis()+"_"+safeKind+ext);
+    InputStream in=getContentResolver().openInputStream(uri);
+    if(in==null)throw new IOException("cannot open attachment");
+    try(FileOutputStream os=new FileOutputStream(out)){
+        byte[] buf=new byte[8192];int n;while((n=in.read(buf))!=-1)os.write(buf,0,n);
+    }finally{in.close();}
+    return out.getAbsolutePath();
+}
 @Override protected void onActivityResult(int r,int c,Intent data){super.onActivityResult(r,c,data);if(c!=RESULT_OK||data==null)return;if(r==9001){try{OutputStream out=getContentResolver().openOutputStream(data.getData());out.write(getPreferences(0).getString("backup_pending","{}").getBytes("UTF-8"));out.close();toast("Резервная копия сохранена");}catch(Exception e){toast("Не удалось сохранить резервную копию");}}else if(r==9002){try{File src=new File(getPreferences(0).getString("full_backup_pending",""));OutputStream out=getContentResolver().openOutputStream(data.getData());FileInputStream in=new FileInputStream(src);byte[] buf=new byte[8192];int n;while((n=in.read(buf))!=-1)out.write(buf,0,n);in.close();out.close();toast("Полная копия сохранена");}catch(Exception e){toast("Не удалось сохранить полную копию");}}else if(r==IMPORT)importData(data.getData());else if(r==9003)importZip(data.getData());else if(r==PICK_PHOTO||r==PICK_FILE){pendingAttachment=copyAttachmentToApp(data.getData(),r==PICK_PHOTO?"photo":"file");getPreferences(0).edit().putString("pending_attachment",pendingAttachment).apply();toast("Файл выбран");}}
  void toast(String s){Toast.makeText(this,s,Toast.LENGTH_SHORT).show();}
  @Override public void onBackPressed(){if(screen!=0){screen=0;render();}else super.onBackPressed();}
