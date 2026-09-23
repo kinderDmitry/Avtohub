@@ -1,8 +1,5 @@
-# Build verification
+# Build verification status — 2.1.0
 
-The project was statically checked in this environment:
-- XML resources parse successfully.
-- Java source files have balanced braces/parentheses/brackets.
-- Gradle/Android SDK are not installed in the execution environment, so `:app:assembleDebug` could not be executed locally.
+The supplied GitHub Actions log did not compile the application. It failed earlier because `android-actions/setup-android@v3` attempted to run the obsolete `sdkmanager tools` package. The workflow has been replaced so it does not invoke that package and instead verifies/installs only `platform-tools`, `platforms;android-35`, and `build-tools;35.0.0`.
 
-GitHub Actions is configured for JDK 17, Gradle 8.11.1, Android SDK 35 and Build Tools 35.0.0 and runs `gradle --no-daemon --stacktrace :app:assembleDebug`, verifies the APK, and uploads it as an artifact.
+A local Android SDK is not installed in this execution environment, so no claim of a locally built APK is made. The new workflow is the authoritative build check.

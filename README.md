@@ -1,9 +1,22 @@
-# AUTO HUB 2.0.0
+# AUTO HUB 2.1.0
 
-Premium Automotive / Mirror Glass / local-first vehicle management app.
+Рабочий local-first Android-проект для управления автомобилем.
 
-Implemented: multi-vehicle SQLite persistence, maintenance, fuel, expenses, reminders, issues, tires, documents, parts, service centers, activity timeline, statistics, search, JSON backup/restore, photo/file attachment via Android pickers, notifications, dark/light theme, RU/EN strings at UI level, vehicle isolation and calculated dashboard state.
+## Что исправлено
+- GitHub Actions больше не использует устаревший `sdkmanager tools`.
+- Сборка явно проверяет Android SDK 35 / Build Tools 35.0.0 и выполняет `:app:assembleDebug`.
+- Удалена ссылка на отсутствующий `ReminderReceiver`.
+- Исправлена повторная отправка mileage-напоминаний: одно уведомление на достигнутый порог.
+- Повторяющиеся напоминания после срабатывания планируются заново.
+- Добавлена миграция локальной БД v3 и уведомления по срокам документов.
+- Поиск обслуживания реально фильтрует список.
+- Периоды финансов и статистики реально переключают расчёт.
+- Для шин добавлено реальное действие «Установить комплект».
+- Добавлена кнопка возврата из экранов ввода.
+- Вложение не остаётся глобально прикреплённым к следующей случайной записи.
 
-Build: Gradle 8.11.1, JDK 17, Android SDK 35, `gradle :app:assembleDebug`.
+## Сборка
+`./gradlew --no-daemon --stacktrace :app:assembleDebug`
 
-No fake OBD/GPS values are generated.
+## Ограничения
+OBD/GPS не имитируются. Внешние карты, цены, рейтинги и диагностика двигателя не генерируются без реального источника данных.

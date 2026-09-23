@@ -1,21 +1,41 @@
-/mnt/data/autohub_work/final/AUTO_HUB/.github/workflows/build.yml
-/mnt/data/autohub_work/final/AUTO_HUB/BUILD_STATUS.md
-/mnt/data/autohub_work/final/AUTO_HUB/PROJECT_FILES.txt
-/mnt/data/autohub_work/final/AUTO_HUB/README.md
-/mnt/data/autohub_work/final/AUTO_HUB/app/build.gradle
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/AndroidManifest.xml
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/java/com/autohub/app/AutoDb.java
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/java/com/autohub/app/BootReceiver.java
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/java/com/autohub/app/MainActivity.java
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/java/com/autohub/app/MileageReminderWorker.java
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/java/com/autohub/app/NotificationHelper.java
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/java/com/autohub/app/ReminderWorker.java
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/res/drawable/car_placeholder.xml
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/res/drawable/ic_launcher.xml
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/res/values/colors.xml
-/mnt/data/autohub_work/final/AUTO_HUB/app/src/main/res/values/styles.xml
-/mnt/data/autohub_work/final/AUTO_HUB/build.gradle
-/mnt/data/autohub_work/final/AUTO_HUB/gradle.properties
-/mnt/data/autohub_work/final/AUTO_HUB/gradlew
-/mnt/data/autohub_work/final/AUTO_HUB/gradlew.bat
-/mnt/data/autohub_work/final/AUTO_HUB/settings.gradle
+AUTO HUB 2.1.0
+
+Core
+- app/src/main/java/com/autohub/app/MainActivity.java
+- AutoDb.java
+- ReminderWorker.java
+- MileageReminderWorker.java
+- DocumentReminderWorker.java
+- BootReceiver.java
+- NotificationHelper.java
+
+Persistent entities
+Vehicle
+ServiceRecord
+FuelRecord
+Expense
+Reminder
+Issue
+TireSet
+Document
+Part
+ServiceCenter
+ActivityEvent
+
+Functional areas
+- onboarding / vehicle CRUD / multi-vehicle isolation
+- maintenance / fuel / finance / reminders / issues / tires / documents
+- parts / service centers / statistics / timeline / search
+- JSON backup + full ZIP backup with stored attachments
+- JSON import + full ZIP import with transactional DB update
+- dark/light theme
+- RU/EN toggle
+- Android notifications
+
+Build
+- Gradle 8.11.1
+- Android Gradle Plugin 8.9.2
+- JDK 17
+- compileSdk/targetSdk 35
+- Build Tools 35.0.0
+- GitHub Actions: .github/workflows/build.yml
