@@ -1,4 +1,4 @@
-# AUTO HUB 2.1.0
+# AUTO HUB 2.1.1
 
 Рабочий local-first Android-проект для управления автомобилем.
 
