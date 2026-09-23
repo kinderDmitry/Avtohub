@@ -1,0 +1,3 @@
+package com.autohub.app;
+import android.content.*;import android.database.Cursor;import java.text.*;import java.util.*;
+public class BootReceiver extends BroadcastReceiver{public void onReceive(Context c,Intent i){AutoDb db=new AutoDb(c);Cursor q=db.raw("SELECT id,title,date,repeatDays,done FROM reminder WHERE done=0",null);try{while(q.moveToNext()){long id=q.getLong(0);String t=q.getString(1);String date=q.getString(2);int rep=q.getInt(3);try{long when=new SimpleDateFormat("yyyy-MM-dd",Locale.US).parse(date).getTime();ReminderWorker.schedule(c,id,t,Math.max(0,when-System.currentTimeMillis()),rep);}catch(Exception ignored){}}}finally{q.close();}}}
