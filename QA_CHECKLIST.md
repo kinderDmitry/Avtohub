@@ -1,4 +1,4 @@
-# AUTO HUB QA 2.1.1
+# AUTO HUB QA 2.1.2
 
 ## Build
 - [ ] GitHub Actions проходит `:app:assembleDebug`
