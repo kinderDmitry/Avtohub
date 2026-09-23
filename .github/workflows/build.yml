@@ -34,6 +34,25 @@ jobs:
           "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
           test -d "$ANDROID_SDK_ROOT/platforms/android-35"
           test -d "$ANDROID_SDK_ROOT/build-tools/35.0.0"
+      - name: Preflight resource validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root = Path("app/src/main/res")
+          forbidden = {"cx", "cy", "r", "rx", "ry", "x1", "x2", "y1", "y2"}
+          for path in root.rglob("*.xml"):
+              ET.parse(path)
+              text = path.read_text(encoding="utf-8")
+              if "<vector" in text:
+                  for line_no, line in enumerate(text.splitlines(), 1):
+                      for attr in forbidden:
+                          if f"android:{attr}=" in line:
+                              raise SystemExit(f"Unsupported VectorDrawable attribute android:{attr} in {path}:{line_no}")
+          print("Resource preflight: OK")
+          PY
       - name: Build debug APK
         shell: bash
         run: |
@@ -49,5 +68,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AUTO_HUB-debug-2.1.0
+          name: AUTO_HUB-debug-2.1.2
           path: app/build/outputs/apk/debug/app-debug.apk
