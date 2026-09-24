@@ -1,4 +1,4 @@
-name: AUTO HUB Build
+name: AUTO HUB Production Build
 
 on:
   push:
@@ -53,6 +53,12 @@ jobs:
                               raise SystemExit(f"Unsupported VectorDrawable attribute android:{attr} in {path}:{line_no}")
           print("Resource preflight: OK")
           PY
+      - name: Unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          ./gradlew --no-daemon --stacktrace test
       - name: Build debug APK
         shell: bash
         run: |
@@ -68,5 +74,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AUTO_HUB-debug-2.1.4
+          name: AUTO_HUB-debug-3.0.0
           path: app/build/outputs/apk/debug/app-debug.apk
