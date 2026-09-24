@@ -1,4 +1,4 @@
-# Build status — AUTO HUB 3.0.0
+# Build status — AUTO HUB 3.1.0
 
 - XML resource parse: PASS (local static check)
 - Java brace/source structure sanity: PASS (local static check)

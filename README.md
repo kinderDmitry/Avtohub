@@ -1,4 +1,4 @@
-# AUTO HUB 3.0.0
+# AUTO HUB 3.1.0
 
 Полная production-ориентированная версия AUTO HUB на базе текущего рабочего проекта, расширенная до требований MASTER PROMPT.
 
@@ -28,7 +28,7 @@ Local-first: пользовательские данные хранятся ло
 - GitHub Actions для тестов и APK.
 
 ## Версия
-`3.0.0` / `versionCode 300`
+`3.1.0` / `versionCode 310`
 
 ## CI
 Workflow: `.github/workflows/build.yml`
