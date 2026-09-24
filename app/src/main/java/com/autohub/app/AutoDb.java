@@ -13,7 +13,7 @@ import java.util.Locale;
 /** Local-first persistent store. All business records are scoped by vehicleId. */
 public final class AutoDb extends SQLiteOpenHelper {
     static final String DB = "autohub.db";
-    static final int V = 3;
+    static final int V = 4;
 
     public AutoDb(Context c) { super(c, DB, null, V); }
 
@@ -34,6 +34,8 @@ public final class AutoDb extends SQLiteOpenHelper {
         d.execSQL("CREATE TABLE part(id INTEGER PRIMARY KEY AUTOINCREMENT,vehicleId INTEGER,name TEXT,brand TEXT,partNumber TEXT,quantity REAL,price REAL,purchaseDate TEXT,supplier TEXT,note TEXT,serviceId INTEGER)");
         d.execSQL("CREATE TABLE service_center(id INTEGER PRIMARY KEY AUTOINCREMENT,vehicleId INTEGER,name TEXT,address TEXT,phone TEXT,website TEXT,note TEXT)");
         d.execSQL("CREATE TABLE activity(id INTEGER PRIMARY KEY AUTOINCREMENT,vehicleId INTEGER,kind TEXT,title TEXT,detail TEXT,date TEXT,time TEXT,createdAt INTEGER)");
+        d.execSQL("CREATE TABLE app_setting(key TEXT PRIMARY KEY,value TEXT NOT NULL)");
+        createIndexes(d);
     }
 
     @Override public void onUpgrade(SQLiteDatabase d, int oldVersion, int newVersion) {
@@ -45,6 +47,22 @@ public final class AutoDb extends SQLiteOpenHelper {
         if (oldVersion < 3) {
             try { d.execSQL("ALTER TABLE document ADD COLUMN lastNotifiedAt INTEGER DEFAULT 0"); } catch (Exception ignored) { }
         }
+        if (oldVersion < 4) {
+            d.execSQL("CREATE TABLE IF NOT EXISTS app_setting(key TEXT PRIMARY KEY,value TEXT NOT NULL)");
+            createIndexes(d);
+        }
+    }
+
+    private void createIndexes(SQLiteDatabase d) {
+        String[] indexes = {
+            "CREATE INDEX IF NOT EXISTS idx_service_vehicle_date ON service(vehicleId,date)",
+            "CREATE INDEX IF NOT EXISTS idx_fuel_vehicle_mileage ON fuel(vehicleId,mileage)",
+            "CREATE INDEX IF NOT EXISTS idx_expense_vehicle_date ON expense(vehicleId,date)",
+            "CREATE INDEX IF NOT EXISTS idx_reminder_vehicle_date ON reminder(vehicleId,date)",
+            "CREATE INDEX IF NOT EXISTS idx_document_vehicle_expiry ON document(vehicleId,expiryDate)",
+            "CREATE INDEX IF NOT EXISTS idx_activity_vehicle_created ON activity(vehicleId,createdAt)"
+        };
+        for (String sql : indexes) d.execSQL(sql);
     }
 
     long insert(String table, ContentValues v) { return getWritableDatabase().insertOrThrow(table, null, v); }
