@@ -64,3 +64,7 @@ Workflow: `.github/workflows/build.yml`
 ## Исправления сборки (hotfix)
 - `setTrackTintList` -> `setProgressBackgroundTintList` (метода нет в android.widget.ProgressBar; ошибка существовала ещё в 4.0.0 и блокировала компиляцию);
 - восстановлен `res/drawable/ic_launcher.xml` — используется как small icon уведомлений в NotificationHelper.
+
+## Исправления сборки (hotfix 2)
+- `partDialog`: переменная `o` переприсваивалась (`o=new JSONObject(); ... o=row(old)`), из-за чего лямбда `setOnClickListener` не компилировалась («must be final or effectively final»). Тот же скрытый паттерн исправлен во всех 6 диалогах (fuel, expense, reminder, tire, part, service_center) по образцу serviceDialog;
+- предыдущий hotfix: `setTrackTintList` -> `setProgressBackgroundTintList` (x2), восстановлен drawable/ic_launcher.xml для NotificationHelper.
