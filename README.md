@@ -60,3 +60,7 @@ Workflow: `.github/workflows/build.yml`
 - эффективность заправок: лучшая/худшая л/100 км (Статистика);
 - «Поделиться сводкой» — текстовый отчёт (Данные);
 - адаптивная неоновая иконка-спидометр + monochrome (Android 13+).
+
+## Исправления сборки (hotfix)
+- `setTrackTintList` -> `setProgressBackgroundTintList` (метода нет в android.widget.ProgressBar; ошибка существовала ещё в 4.0.0 и блокировала компиляцию);
+- восстановлен `res/drawable/ic_launcher.xml` — используется как small icon уведомлений в NotificationHelper.
